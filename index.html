@@ -361,18 +361,16 @@
   </div>
 </div>
 
-<!-- PROMEMORIA -->
+<!-- PROMEMORIA (Google Tasks) -->
 <div class="card">
   <div class="card-label">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
     Promemoria
+    <span id="reminders-sync" style="margin-left:auto;font-size:10px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0"></span>
   </div>
-  <div class="reminder-add">
-    <input type="text" id="reminder-input" placeholder="Nuovo promemoria…" maxlength="120"
-      onkeydown="if(event.key==='Enter') addReminder()">
-    <button onclick="addReminder()">+</button>
+  <div id="reminders-content">
+    <div class="no-reminders">Accedi con Google per i tuoi promemoria</div>
   </div>
-  <div id="reminders-list"></div>
 </div>
 
 <div id="toast"></div>
@@ -383,7 +381,7 @@
 // ═══════════════════════════════════════════
 const GOOGLE_CLIENT_ID = '1070963206755-3eidjscj8u8sc4nlf0n0plu4tb6niq5a.apps.googleusercontent.com';
 const OWM_KEY = '1805b29c395233b1bfa7efcc42e73ead';
-const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
+const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/tasks';
 
 // ═══════════════════════════════════════════
 //  OROLOGIO
@@ -483,6 +481,7 @@ function signOut() {
   localStorage.removeItem('gtoken');
   localStorage.removeItem('gtoken_exp');
   renderCalendarAuth();
+  renderRemindersLoggedOut();
   toast('Disconnesso da Google');
 }
 
@@ -615,49 +614,152 @@ function escapeHtml(s) {
 }
 
 // ═══════════════════════════════════════════
-//  PROMEMORIA (localStorage)
+//  PROMEMORIA (Google Tasks API)
 // ═══════════════════════════════════════════
-let reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+let taskListId = null;
+let tasks = [];
 
-function saveReminders() {
-  localStorage.setItem('reminders', JSON.stringify(reminders));
+function renderRemindersLoggedOut() {
+  document.getElementById('reminders-content').innerHTML =
+    '<div class="no-reminders">Accedi con Google per i tuoi promemoria</div>';
+  document.getElementById('reminders-sync').textContent = '';
 }
 
-function renderReminders() {
-  const el = document.getElementById('reminders-list');
-  if (!reminders.length) {
-    el.innerHTML = '<div class="no-reminders">Nessun promemoria</div>';
-    return;
+async function loadTasks() {
+  const content = document.getElementById('reminders-content');
+  content.innerHTML = `<div style="text-align:center;padding:12px 0"><div class="spinner"></div></div>`;
+
+  try {
+    // 1. Trova la lista di default (la prima)
+    const listRes = await fetch('https://www.googleapis.com/tasks/v1/users/@me/lists', {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (listRes.status === 401) { handleAuthExpired(); return; }
+    const lists = await listRes.json();
+    taskListId = lists.items && lists.items.length ? lists.items[0].id : null;
+    if (!taskListId) {
+      content.innerHTML = '<div class="no-reminders">Nessuna lista attività trovata</div>';
+      return;
+    }
+
+    // 2. Carica i task (inclusi i completati)
+    const tRes = await fetch(
+      `https://www.googleapis.com/tasks/v1/lists/${taskListId}/tasks?showCompleted=true&showHidden=true&maxResults=100`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    const tData = await tRes.json();
+    tasks = (tData.items || []).sort((a, b) => {
+      // non completati prima, poi per posizione
+      if ((a.status === 'completed') !== (b.status === 'completed'))
+        return a.status === 'completed' ? 1 : -1;
+      return (a.position || '').localeCompare(b.position || '');
+    });
+    renderTasks();
+  } catch (e) {
+    content.innerHTML = '<div class="no-reminders">Errore caricamento promemoria</div>';
   }
-  el.innerHTML = reminders.map((r, i) => `
-    <div class="reminder-item">
-      <div class="reminder-check${r.done?' done':''}" onclick="toggleReminder(${i})"></div>
-      <div class="reminder-text${r.done?' done':''}">${escapeHtml(r.text)}</div>
-      <button class="reminder-del" onclick="deleteReminder(${i})">×</button>
+}
+
+function renderTasks() {
+  document.getElementById('reminders-sync').innerHTML =
+    '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#5dcaa5" stroke-width="2.5" style="vertical-align:-1px"><path d="M20 6L9 17l-5-5"/></svg> sincr.';
+
+  const list = tasks.map(t => {
+    const done = t.status === 'completed';
+    return `
+      <div class="reminder-item">
+        <div class="reminder-check${done?' done':''}" onclick="toggleTask('${t.id}')"></div>
+        <div class="reminder-text${done?' done':''}">${escapeHtml(t.title || '(senza titolo)')}</div>
+        <button class="reminder-del" onclick="deleteTask('${t.id}')">×</button>
+      </div>`;
+  }).join('');
+
+  document.getElementById('reminders-content').innerHTML = `
+    <div class="reminder-add">
+      <input type="text" id="reminder-input" placeholder="Nuovo promemoria…" maxlength="120"
+        onkeydown="if(event.key==='Enter') addTask()">
+      <button onclick="addTask()">+</button>
     </div>
-  `).join('');
+    ${list || '<div class="no-reminders">Nessun promemoria</div>'}
+  `;
 }
 
-function addReminder() {
+async function addTask() {
   const input = document.getElementById('reminder-input');
-  const text = input.value.trim();
-  if (!text) return;
-  reminders.unshift({ text, done: false, id: Date.now() });
-  saveReminders();
-  renderReminders();
+  const title = input.value.trim();
+  if (!title || !taskListId) return;
   input.value = '';
+
+  // ottimistico: aggiungo subito in UI
+  const temp = { id: 'temp_' + Date.now(), title, status: 'needsAction', position: '00000' };
+  tasks.unshift(temp);
+  renderTasks();
+
+  try {
+    const res = await fetch(`https://www.googleapis.com/tasks/v1/lists/${taskListId}/tasks`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ title })
+    });
+    if (res.status === 401) { handleAuthExpired(); return; }
+    await loadTasks();
+  } catch (e) {
+    toast('Errore: promemoria non salvato');
+  }
 }
 
-function toggleReminder(i) {
-  reminders[i].done = !reminders[i].done;
-  saveReminders();
-  renderReminders();
+async function toggleTask(id) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  const newStatus = t.status === 'completed' ? 'needsAction' : 'completed';
+  t.status = newStatus;
+  renderTasks();
+
+  try {
+    const body = { status: newStatus };
+    if (newStatus === 'completed') body.completed = new Date().toISOString();
+    else body.completed = null;
+
+    const res = await fetch(`https://www.googleapis.com/tasks/v1/lists/${taskListId}/tasks/${id}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if (res.status === 401) { handleAuthExpired(); return; }
+    await loadTasks();
+  } catch (e) {
+    toast('Errore sincronizzazione');
+  }
 }
 
-function deleteReminder(i) {
-  reminders.splice(i, 1);
-  saveReminders();
-  renderReminders();
+async function deleteTask(id) {
+  tasks = tasks.filter(x => x.id !== id);
+  renderTasks();
+
+  try {
+    const res = await fetch(`https://www.googleapis.com/tasks/v1/lists/${taskListId}/tasks/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (res.status === 401) { handleAuthExpired(); return; }
+  } catch (e) {
+    toast('Errore eliminazione');
+  }
+}
+
+function handleAuthExpired() {
+  accessToken = null;
+  localStorage.removeItem('gtoken');
+  localStorage.removeItem('gtoken_exp');
+  renderCalendarAuth();
+  renderRemindersLoggedOut();
+  toast('Sessione scaduta, riaccedi');
 }
 
 // ═══════════════════════════════════════════
@@ -673,10 +775,11 @@ function toast(msg) {
 // ═══════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════
-renderReminders();
+renderRemindersLoggedOut();
 
 if (checkTokenFromUrl() || checkStoredToken()) {
   loadCalendar();
+  loadTasks();
 }
 
 // SERVICE WORKER
