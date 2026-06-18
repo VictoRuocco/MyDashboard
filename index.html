@@ -9,9 +9,9 @@
 <meta name="apple-mobile-web-app-title" content="Dashboard">
 <title>MyDashboard</title>
 <link rel="manifest" href="./manifest.json">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Oswald:wght@300;500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="http://googleusercontent.com/fonts.googleapis.com/0">
+<link rel="preconnect" href="http://googleusercontent.com/fonts.gstatic.com/0" crossorigin>
+<link href="http://googleusercontent.com/fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Oswald:wght@300;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0f1117;
@@ -33,7 +33,7 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
     min-height: 100vh;
     padding: 0 0 80px;
     max-width: 480px;
@@ -281,10 +281,10 @@
 <!-- MODALE NUOVO EVENTO -->
 <div class="modal-overlay" id="event-modal">
   <div class="modal-sheet">
-    <div class="modal-title">Nuovo evento</div>
+    <div class="modal-title">Nuovo Evento</div>
     <div class="field">
       <label>Titolo</label>
-      <input type="text" id="ev-title" placeholder="Es. Riunione con team" maxlength="200">
+      <input type="text" id="ev-title" placeholder="Nome Evento" maxlength="200">
     </div>
     <div class="field">
       <label>Data</label>
@@ -299,32 +299,32 @@
     </div>
     <div class="field-row" id="ev-time-row">
       <div class="field">
-        <label>Ora inizio</label>
+        <label>Ora Inizio</label>
         <input type="time" id="ev-start" value="09:00">
       </div>
       <div class="field">
-        <label>Ora fine</label>
+        <label>Ora Fine</label>
         <input type="time" id="ev-end" value="10:00">
       </div>
     </div>
     <div class="field">
       <label>Ripetizione</label>
       <select id="ev-recur">
-        <option value="">Non si ripete</option>
-        <option value="RRULE:FREQ=DAILY">Ogni giorno</option>
-        <option value="RRULE:FREQ=WEEKLY">Ogni settimana</option>
-        <option value="RRULE:FREQ=MONTHLY">Ogni mese</option>
-        <option value="RRULE:FREQ=YEARLY">Ogni anno</option>
+        <option value="">Nessuna</option>
+        <option value="RRULE:FREQ=DAILY">Giornaliera</option>
+        <option value="RRULE:FREQ=WEEKLY">Settimanale</option>
+        <option value="RRULE:FREQ=MONTHLY">Mensile</option>
+        <option value="RRULE:FREQ=YEARLY">Annuale</option>
       </select>
     </div>
     <div class="field">
       <label>Notifica</label>
       <select id="ev-remind">
-        <option value="0">All'orario di inizio</option>
-        <option value="10">10 minuti prima</option>
-        <option value="30" selected>30 minuti prima</option>
-        <option value="60">1 ora prima</option>
-        <option value="1440">1 giorno prima</option>
+        <option value="0">Iniziale</option>
+        <option value="10">10 Minuti Prima</option>
+        <option value="30" selected>30 Minuti Prima</option>
+        <option value="60">1 Ora Prima</option>
+        <option value="1440">Il Giorno Prima</option>
         <option value="none">Nessuna</option>
       </select>
     </div>
@@ -367,8 +367,8 @@ function updateClock() {
   document.querySelector('#clock-time .ore').textContent = hh;
   document.querySelector('#clock-time .min').textContent = mm;
 
-  const days = ['domenica','lunedì','martedì','mercoledì','giovedì','venerdì','sabato'];
-  const months = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+  const days = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+	const months = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
   document.getElementById('clock-date').textContent =
     days[now.getDay()] + ', ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
 }
@@ -399,23 +399,23 @@ async function loadWeather(lat, lon) {
         '<div class="weather-temp" style="margin-left:auto">' + Math.round(d.main.temp) + '<sup>°C</sup></div>' +
       '</div>' +
       '<div class="weather-row">' +
-        '<div class="weather-pill"><strong>' + Math.round(d.main.feels_like) + '°C</strong>percepita</div>' +
-        '<div class="weather-pill"><strong>' + d.main.humidity + '%</strong>umidità</div>' +
-        '<div class="weather-pill"><strong>' + Math.round(d.wind.speed * 3.6) + ' km/h</strong>vento</div>' +
+        '<div class="weather-pill"><strong>' + Math.round(d.main.feels_like) + '°C</strong>Percepita</div>' +
+        '<div class="weather-pill"><strong>' + d.main.humidity + '%</strong>Umidità</div>' +
+        '<div class="weather-pill"><strong>' + Math.round(d.wind.speed * 3.6) + ' km/h</strong>Vento</div>' +
       '</div>';
   } catch(e) {
-    document.getElementById('weather-content').innerHTML = '<div class="no-events">Errore caricamento meteo</div>';
+    document.getElementById('weather-content').innerHTML = '<div class="no-events">Errore Caricamento Meteo</div>';
   }
 }
 
 function initWeather() {
   if (!navigator.geolocation) {
-    document.getElementById('weather-content').innerHTML = '<div class="no-events">GPS non disponibile</div>';
+    document.getElementById('weather-content').innerHTML = '<div class="no-events">GPS Non Disponibile</div>';
     return;
   }
   navigator.geolocation.getCurrentPosition(
     function(pos) { loadWeather(pos.coords.latitude, pos.coords.longitude); },
-    function() { document.getElementById('weather-content').innerHTML = '<div class="no-events">Posizione non disponibile</div>'; }
+    function() { document.getElementById('weather-content').innerHTML = '<div class="no-events">Posizione Non Disponibile</div>'; }
   );
 }
 initWeather();
@@ -483,7 +483,7 @@ function handleAuthExpired() {
 }
 
 // ═══════════════════════════════════════════
-//  CALENDARIO — lettura eventi
+//  CALENDARIO - Lettura Eventi
 // ═══════════════════════════════════════════
 async function loadCalendar() {
   document.getElementById('calendar-content').innerHTML =
@@ -504,7 +504,7 @@ async function loadCalendar() {
     const data = await r.json();
     renderEvents(data.items || []);
   } catch(e) {
-    document.getElementById('calendar-content').innerHTML = '<div class="no-events">Errore caricamento eventi</div>';
+    document.getElementById('calendar-content').innerHTML = '<div class="no-events">Errore Caricamento Eventi</div>';
   }
 }
 
@@ -512,13 +512,13 @@ function renderEvents(events) {
   if (!events.length) {
     document.getElementById('calendar-content').innerHTML =
       '<div class="no-events">Nessun evento nei prossimi 7 giorni</div>' +
-      '<button class="auth-btn logout" onclick="signOut()">Disconnetti account</button>';
+      '<button class="auth-btn logout" onclick="signOut()">Disconnetti Account</button>';
     return;
   }
   const today = new Date(); today.setHours(0,0,0,0);
   const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
-  const days = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
-  const months2 = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+  const days = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+	const months2 = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 
   let html = '';
   let lastDay = '';
@@ -537,24 +537,24 @@ function renderEvents(events) {
     const isToday = startDay.getTime() === today.getTime();
     const timeStr = ev.start.dateTime
       ? start.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'})
-      : 'tutto il giorno';
+      : 'Tutto Il Giorno';
     html += '<div class="event-item">' +
       '<div class="event-time-col">' + timeStr + '</div>' +
       '<div class="event-dot' + (isToday?' today':'') + '"></div>' +
-      '<div><div class="event-title">' + escapeHtml(ev.summary || '(senza titolo)') + '</div>' +
+      '<div><div class="event-title">' + escapeHtml(ev.summary || '(Senza Titolo)') + '</div>' +
       (ev.location ? '<div class="event-sub">📍 ' + escapeHtml(ev.location) + '</div>' : '') +
       (ev.recurringEventId ? '<div class="event-sub">🔁 ricorrente</div>' : '') +
       '</div></div>';
   });
-  html += '<button class="auth-btn logout" onclick="signOut()">Disconnetti account</button>';
+  html += '<button class="auth-btn logout" onclick="signOut()">Disconnetti Account</button>';
   document.getElementById('calendar-content').innerHTML = html;
 }
 
-// ═══════════════════════════════════════════
-//  CALENDARIO — nuovo evento (scrittura via API)
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════
+//  CALENDARIO - Nuovo Evento (Scrittura via API)
+// ═══════════════════════════════════════════════
 function openEventModal() {
-  if (!accessToken) { toast('Accedi con Google prima'); return; }
+  if (!accessToken) { toast('Accedi con Google'); return; }
   // data di default: oggi
   const now = new Date();
   const p = function(n){ return String(n).padStart(2,'0'); };
@@ -656,7 +656,7 @@ function renderRemindersLoggedOut() {
 
 function openGoogleTasks() {
   if (/Android/i.test(navigator.userAgent)) {
-    window.location.href = 'intent:#Intent;package=com.google.android.apps.tasks;S.browser_fallback_url=https%3A%2F%2Ftasks.google.com%2F;end';
+    window.location.href = 'intent://tasks.google.com/#Intent;scheme=https;package=com.google.android.apps.tasks;S.browser_fallback_url=https%3A%2F%2Ftasks.google.com%2F;end';
   } else {
     window.open('https://tasks.google.com/', '_blank');
   }
@@ -686,23 +686,23 @@ async function loadTasks() {
     });
     renderTasks();
   } catch(e) {
-    content.innerHTML = '<div class="no-reminders">Errore caricamento promemoria</div>';
+    content.innerHTML = '<div class="no-reminders">Errore Caricamento Promemoria</div>';
   }
 }
 
 function fmtDue(due) {
   if (!due) return '';
   const d = new Date(due);
-  const months = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+  const months = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
   return d.getUTCDate() + ' ' + months[d.getUTCMonth()];
 }
 
 function renderTasks() {
   document.getElementById('reminders-sync').innerHTML =
-    '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#5dcaa5" stroke-width="2.5" style="vertical-align:-1px"><path d="M20 6L9 17l-5-5"/></svg> sincr.';
+    '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#5dcaa5" stroke-width="2.5" style="vertical-align:-1px"><path d="M20 6L9 17l-5-5"/></svg> Sync';
 
   if (!tasks.length) {
-    document.getElementById('reminders-content').innerHTML = '<div class="no-reminders">Nessun promemoria</div>';
+    document.getElementById('reminders-content').innerHTML = '<div class="no-reminders">Nessun Promemoria</div>';
     return;
   }
   const list = tasks.map(function(t) {
@@ -712,7 +712,7 @@ function renderTasks() {
       '<div class="reminder-check' + (done?' done':'') + '" onclick="toggleTask(\'' + t.id + '\')"></div>' +
       '<div class="reminder-body">' +
         '<div class="reminder-text' + (done?' done':'') + '">' + escapeHtml(t.title || '(senza titolo)') + '</div>' +
-        (due ? '<div class="reminder-due">📅 ' + due + '</div>' : '') +
+        (due ? '<div class="reminder-due"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="vertical-align:-1px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' + due + '</div>' : '') +
       '</div>' +
       '<button class="reminder-del" onclick="deleteTask(\'' + t.id + '\')">×</button>' +
       '</div>';
