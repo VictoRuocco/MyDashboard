@@ -2,13 +2,16 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0f1117">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dashboard">
 <title>MyDashboard</title>
 <link rel="manifest" href="./manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Oswald:wght@300;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0f1117;
@@ -30,11 +33,12 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     min-height: 100vh;
     padding: 0 0 80px;
     max-width: 480px;
     margin: 0 auto;
+    -webkit-font-smoothing: antialiased;
   }
 
   /* ── HEADER OROLOGIO ── */
@@ -43,18 +47,21 @@
     text-align: center;
   }
   .clock-time {
-    font-size: 72px;
-    font-weight: 200;
-    letter-spacing: -2px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 78px;
     line-height: 1;
+    letter-spacing: 1px;
     color: var(--text);
   }
-  .clock-time span { color: var(--accent); }
+  .clock-time .ore { font-weight: 700; }
+  .clock-time .sep { font-weight: 300; color: var(--accent); margin: 0 3px; }
+  .clock-time .min { font-weight: 300; }
   .clock-date {
-    margin-top: 8px;
+    margin-top: 10px;
     font-size: 15px;
     color: var(--muted);
     text-transform: capitalize;
+    font-weight: 400;
   }
 
   /* ── CARD BASE ── */
@@ -77,54 +84,33 @@
     gap: 6px;
   }
   .card-label svg { opacity: 0.6; }
+  .card-add-btn {
+    margin-left: auto;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--accent);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  .card-add-btn:active { background: var(--accent); color: #fff; }
 
   /* ── METEO ── */
-  .weather-main {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
+  .weather-main { display: flex; align-items: center; gap: 16px; }
   .weather-icon { font-size: 48px; line-height: 1; }
-  .weather-temp {
-    font-size: 44px;
-    font-weight: 200;
-    letter-spacing: -1px;
-  }
+  .weather-temp { font-size: 44px; font-weight: 300; font-family: 'Oswald', sans-serif; letter-spacing: -1px; }
   .weather-temp sup { font-size: 20px; vertical-align: super; color: var(--muted); }
-  .weather-details {
-    flex: 1;
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.8;
-  }
-  .weather-city {
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--text);
-    margin-bottom: 2px;
-  }
-  .weather-row {
-    display: flex;
-    gap: 16px;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--border);
-  }
-  .weather-pill {
-    flex: 1;
-    text-align: center;
-    font-size: 12px;
-    color: var(--muted);
-  }
-  .weather-pill strong {
-    display: block;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    margin-bottom: 2px;
-  }
+  .weather-city { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .weather-row { display: flex; gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .weather-pill { flex: 1; text-align: center; font-size: 12px; color: var(--muted); }
+  .weather-pill strong { display: block; font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
 
-  /* ── STATO AUTH ── */
+  /* ── AUTH ── */
   .auth-btn {
     width: 100%;
     padding: 12px;
@@ -134,14 +120,12 @@
     color: var(--accent);
     font-size: 14px;
     font-weight: 500;
+    font-family: inherit;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
     transition: background 0.15s;
   }
-  .auth-btn:hover { background: rgba(124,131,245,0.1); }
+  .auth-btn:active { background: rgba(124,131,245,0.15); }
   .auth-btn.logout {
     border-color: var(--border);
     color: var(--muted);
@@ -150,182 +134,101 @@
     margin-top: 10px;
   }
 
-  /* ── EVENTI CALENDAR ── */
-  .event-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-  }
+  /* ── EVENTI ── */
+  .event-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
   .event-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .event-time-col {
-    min-width: 44px;
-    text-align: right;
-    font-size: 12px;
-    color: var(--muted);
-    padding-top: 1px;
-    line-height: 1.5;
-  }
-  .event-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--accent);
-    margin-top: 5px;
-    flex-shrink: 0;
-  }
+  .event-time-col { min-width: 44px; text-align: right; font-size: 12px; color: var(--muted); padding-top: 1px; line-height: 1.5; }
+  .event-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-top: 5px; flex-shrink: 0; }
   .event-dot.today { background: var(--accent2); }
-  .event-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    line-height: 1.3;
-  }
-  .event-sub {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 2px;
-  }
-  .event-day-label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--accent);
-    padding: 8px 0 4px;
-  }
-  .no-events {
-    font-size: 14px;
-    color: var(--muted);
-    text-align: center;
-    padding: 16px 0;
-  }
+  .event-title { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.3; }
+  .event-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .event-day-label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); padding: 8px 0 4px; }
+  .no-events { font-size: 14px; color: var(--muted); text-align: center; padding: 16px 0; }
 
   /* ── PROMEMORIA ── */
-  .reminder-add {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-  .reminder-add input {
-    flex: 1;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 10px 14px;
-    color: var(--text);
-    font-size: 14px;
-    outline: none;
-  }
-  .reminder-add input::placeholder { color: var(--muted); }
-  .reminder-add input:focus { border-color: var(--accent); }
-  .reminder-add button {
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-sm);
-    border: none;
-    background: var(--accent);
-    color: #fff;
-    font-size: 22px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-  .reminder-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 0;
-    border-bottom: 1px solid var(--border);
-  }
+  .reminder-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
   .reminder-item:last-child { border-bottom: none; }
   .reminder-check {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    cursor: pointer;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s;
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid var(--border); cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; transition: all 0.15s;
   }
-  .reminder-check.done {
-    background: var(--accent2);
-    border-color: var(--accent2);
-  }
+  .reminder-check.done { background: var(--accent2); border-color: var(--accent2); }
   .reminder-check.done::after {
-    content: '';
-    width: 5px;
-    height: 9px;
-    border: 2px solid #fff;
-    border-top: none;
-    border-left: none;
-    transform: rotate(45deg) translateY(-1px);
-    display: block;
+    content: ''; width: 5px; height: 9px;
+    border: 2px solid #fff; border-top: none; border-left: none;
+    transform: rotate(45deg) translateY(-1px); display: block;
   }
-  .reminder-text {
-    flex: 1;
-    font-size: 14px;
-    color: var(--text);
-    transition: opacity 0.15s;
-  }
-  .reminder-text.done {
-    opacity: 0.35;
-    text-decoration: line-through;
-  }
+  .reminder-body { flex: 1; min-width: 0; }
+  .reminder-text { font-size: 14px; color: var(--text); transition: opacity 0.15s; }
+  .reminder-text.done { opacity: 0.35; text-decoration: line-through; }
+  .reminder-due { font-size: 11px; color: var(--accent2); margin-top: 1px; }
   .reminder-del {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%; border: none;
+    background: transparent; color: var(--muted); font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
-  .reminder-del:hover { color: var(--danger); }
-  .no-reminders {
-    font-size: 14px;
-    color: var(--muted);
-    text-align: center;
-    padding: 12px 0;
-  }
+  .reminder-del:active { color: var(--danger); }
+  .no-reminders { font-size: 14px; color: var(--muted); text-align: center; padding: 12px 0; }
 
   /* ── SPINNER ── */
   .spinner {
-    display: inline-block;
-    width: 18px; height: 18px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    vertical-align: middle;
+    display: inline-block; width: 18px; height: 18px;
+    border: 2px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  /* ── MODALE ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none; align-items: flex-end; justify-content: center;
+    z-index: 1000; backdrop-filter: blur(2px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-sheet {
+    background: var(--surface);
+    border-top-left-radius: 24px; border-top-right-radius: 24px;
+    border: 1px solid var(--border); border-bottom: none;
+    width: 100%; max-width: 480px;
+    padding: 22px 20px calc(24px + env(safe-area-inset-bottom));
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 18px; }
+  .field { margin-bottom: 13px; }
+  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+  .field input, .field select {
+    width: 100%; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 11px 14px; color: var(--text); font-size: 15px;
+    font-family: inherit; outline: none;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent); }
+  .field-row { display: flex; gap: 10px; }
+  .field-row .field { flex: 1; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 13px; }
+  .toggle-row span { font-size: 14px; color: var(--text); }
+  .switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch .slider { position: absolute; inset: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 24px; transition: .2s; cursor: pointer; }
+  .switch .slider::before { content: ''; position: absolute; height: 18px; width: 18px; left: 2px; top: 2px; background: var(--muted); border-radius: 50%; transition: .2s; }
+  .switch input:checked + .slider { background: var(--accent); border-color: var(--accent); }
+  .switch input:checked + .slider::before { transform: translateX(20px); background: #fff; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .modal-actions button { flex: 1; padding: 13px; border-radius: var(--radius-sm); font-size: 15px; font-weight: 500; cursor: pointer; border: none; font-family: inherit; }
+  .btn-cancel { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+  .btn-save { background: var(--accent); color: #fff; }
+
   /* ── TOAST ── */
   #toast {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--surface2);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 50px;
-    padding: 10px 20px;
-    font-size: 13px;
-    transition: transform 0.25s ease;
-    z-index: 999;
-    white-space: nowrap;
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(90px);
+    background: var(--surface2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 50px;
+    padding: 10px 20px; font-size: 13px;
+    transition: transform 0.25s ease; z-index: 1100; white-space: nowrap;
   }
   #toast.show { transform: translateX(-50%) translateY(0); }
 </style>
@@ -334,12 +237,12 @@
 
 <!-- OROLOGIO -->
 <div class="clock-section">
-  <div class="clock-time" id="clock-time">00<span>:</span>00</div>
+  <div class="clock-time" id="clock-time"><span class="ore">00</span><span class="sep">:</span><span class="min">00</span></div>
   <div class="clock-date" id="clock-date"></div>
 </div>
 
 <!-- METEO -->
-<div class="card" id="weather-card">
+<div class="card">
   <div class="card-label">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
     Meteo
@@ -347,29 +250,99 @@
   <div id="weather-content"><div class="spinner"></div></div>
 </div>
 
-<!-- GOOGLE CALENDAR -->
+<!-- CALENDARIO -->
 <div class="card">
   <div class="card-label">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    Google Calendar
+    Calendario
+    <button class="card-add-btn" onclick="openEventModal()" title="Nuovo evento">+</button>
   </div>
   <div id="calendar-content">
-    <button class="auth-btn" id="auth-btn" onclick="signIn()">
+    <button class="auth-btn" onclick="signIn()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
       Accedi con Google
     </button>
   </div>
 </div>
 
-<!-- PROMEMORIA (Google Tasks) -->
+<!-- PROMEMORIA -->
 <div class="card">
   <div class="card-label">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
     Promemoria
     <span id="reminders-sync" style="margin-left:auto;font-size:10px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0"></span>
+    <button class="card-add-btn" onclick="openGoogleTasks()" title="Aggiungi in Google Tasks" style="margin-left:8px">+</button>
   </div>
   <div id="reminders-content">
     <div class="no-reminders">Accedi con Google per i tuoi promemoria</div>
+  </div>
+</div>
+
+<!-- MODALE NUOVO EVENTO -->
+<div class="modal-overlay" id="event-modal">
+  <div class="modal-sheet">
+    <div class="modal-title">Nuovo evento</div>
+    <div class="field">
+      <label>Titolo</label>
+      <input type="text" id="ev-title" placeholder="Es. Riunione con team" maxlength="200">
+    </div>
+    <div class="field">
+      <label>Data</label>
+      <input type="date" id="ev-date">
+    </div>
+    <div class="toggle-row">
+      <span>Tutto il giorno</span>
+      <label class="switch">
+        <input type="checkbox" id="ev-allday" onchange="toggleAllDay()">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="field-row" id="ev-time-row">
+      <div class="field">
+        <label>Ora inizio</label>
+        <input type="time" id="ev-start" value="09:00">
+      </div>
+      <div class="field">
+        <label>Ora fine</label>
+        <input type="time" id="ev-end" value="10:00">
+      </div>
+    </div>
+    <div class="field">
+      <label>Ripetizione</label>
+      <select id="ev-recur">
+        <option value="">Non si ripete</option>
+        <option value="RRULE:FREQ=DAILY">Ogni giorno</option>
+        <option value="RRULE:FREQ=WEEKLY">Ogni settimana</option>
+        <option value="RRULE:FREQ=MONTHLY">Ogni mese</option>
+        <option value="RRULE:FREQ=YEARLY">Ogni anno</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Notifica</label>
+      <select id="ev-remind">
+        <option value="0">All'orario di inizio</option>
+        <option value="10">10 minuti prima</option>
+        <option value="30" selected>30 minuti prima</option>
+        <option value="60">1 ora prima</option>
+        <option value="1440">1 giorno prima</option>
+        <option value="none">Nessuna</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEventModal()">Annulla</button>
+      <button class="btn-save" id="ev-save-btn" onclick="createEvent()">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE CONFERMA -->
+<div class="modal-overlay" id="confirm-overlay" style="align-items:center">
+  <div class="modal-sheet" style="border-radius:20px;max-width:340px;margin:0 16px;animation:none;border-bottom:1px solid var(--border)">
+    <div class="modal-title" id="confirm-msg" style="font-weight:500;font-size:15px;line-height:1.45;margin-bottom:6px"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="confirm-no">Annulla</button>
+      <button class="btn-save" id="confirm-yes" style="background:var(--danger)">Elimina</button>
+    </div>
   </div>
 </div>
 
@@ -381,7 +354,8 @@
 // ═══════════════════════════════════════════
 const GOOGLE_CLIENT_ID = '1070963206755-3eidjscj8u8sc4nlf0n0plu4tb6niq5a.apps.googleusercontent.com';
 const OWM_KEY = '1805b29c395233b1bfa7efcc42e73ead';
-const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/tasks';
+const SCOPES = 'https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/tasks';
+const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Rome';
 
 // ═══════════════════════════════════════════
 //  OROLOGIO
@@ -390,78 +364,64 @@ function updateClock() {
   const now = new Date();
   const hh = String(now.getHours()).padStart(2,'0');
   const mm = String(now.getMinutes()).padStart(2,'0');
-  document.getElementById('clock-time').innerHTML = `${hh}<span>:</span>${mm}`;
+  document.querySelector('#clock-time .ore').textContent = hh;
+  document.querySelector('#clock-time .min').textContent = mm;
 
   const days = ['domenica','lunedì','martedì','mercoledì','giovedì','venerdì','sabato'];
   const months = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
   document.getElementById('clock-date').textContent =
-    `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    days[now.getDay()] + ', ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
 }
 updateClock();
 setInterval(updateClock, 1000);
 
 // ═══════════════════════════════════════════
-//  METEO (GPS → OpenWeatherMap)
+//  METEO (GPS -> OpenWeatherMap)
 // ═══════════════════════════════════════════
 const weatherIcons = {
-  '01d':'☀️','01n':'🌙','02d':'⛅','02n':'⛅',
-  '03d':'☁️','03n':'☁️','04d':'☁️','04n':'☁️',
-  '09d':'🌧️','09n':'🌧️','10d':'🌦️','10n':'🌦️',
+  '01d':'☀️','01n':'🌙','02d':'⛅','02n':'⛅','03d':'☁️','03n':'☁️',
+  '04d':'☁️','04n':'☁️','09d':'🌧️','09n':'🌧️','10d':'🌦️','10n':'🌦️',
   '11d':'⛈️','11n':'⛈️','13d':'❄️','13n':'❄️','50d':'🌫️','50n':'🌫️'
 };
 
 async function loadWeather(lat, lon) {
   try {
-    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=it&appid=${OWM_KEY}`;
+    const url = 'https://api.openweathermap.org/data/2.5/weather?lat=' + lat + '&lon=' + lon + '&units=metric&lang=it&appid=' + OWM_KEY;
     const r = await fetch(url);
     const d = await r.json();
     const icon = weatherIcons[d.weather[0].icon] || '🌡️';
     const desc = d.weather[0].description;
-    const temp = Math.round(d.main.temp);
-    const feels = Math.round(d.main.feels_like);
-    const hum = d.main.humidity;
-    const wind = Math.round(d.wind.speed * 3.6);
-    const city = d.name;
-
-    document.getElementById('weather-content').innerHTML = `
-      <div class="weather-main">
-        <div class="weather-icon">${icon}</div>
-        <div>
-          <div class="weather-city">${city}</div>
-          <div style="font-size:13px;color:var(--muted);text-transform:capitalize">${desc}</div>
-        </div>
-        <div class="weather-temp" style="margin-left:auto">${temp}<sup>°C</sup></div>
-      </div>
-      <div class="weather-row">
-        <div class="weather-pill"><strong>${feels}°C</strong>percepita</div>
-        <div class="weather-pill"><strong>${hum}%</strong>umidità</div>
-        <div class="weather-pill"><strong>${wind} km/h</strong>vento</div>
-      </div>
-    `;
-  } catch(e) {
     document.getElementById('weather-content').innerHTML =
-      `<div class="no-events">Errore caricamento meteo</div>`;
+      '<div class="weather-main">' +
+        '<div class="weather-icon">' + icon + '</div>' +
+        '<div><div class="weather-city">' + escapeHtml(d.name) + '</div>' +
+        '<div style="font-size:13px;color:var(--muted);text-transform:capitalize">' + escapeHtml(desc) + '</div></div>' +
+        '<div class="weather-temp" style="margin-left:auto">' + Math.round(d.main.temp) + '<sup>°C</sup></div>' +
+      '</div>' +
+      '<div class="weather-row">' +
+        '<div class="weather-pill"><strong>' + Math.round(d.main.feels_like) + '°C</strong>percepita</div>' +
+        '<div class="weather-pill"><strong>' + d.main.humidity + '%</strong>umidità</div>' +
+        '<div class="weather-pill"><strong>' + Math.round(d.wind.speed * 3.6) + ' km/h</strong>vento</div>' +
+      '</div>';
+  } catch(e) {
+    document.getElementById('weather-content').innerHTML = '<div class="no-events">Errore caricamento meteo</div>';
   }
 }
 
 function initWeather() {
   if (!navigator.geolocation) {
-    document.getElementById('weather-content').innerHTML =
-      `<div class="no-events">GPS non disponibile</div>`;
+    document.getElementById('weather-content').innerHTML = '<div class="no-events">GPS non disponibile</div>';
     return;
   }
   navigator.geolocation.getCurrentPosition(
-    pos => loadWeather(pos.coords.latitude, pos.coords.longitude),
-    () => {
-      document.getElementById('weather-content').innerHTML =
-        `<div class="no-events">Posizione non disponibile</div>`;
-    }
+    function(pos) { loadWeather(pos.coords.latitude, pos.coords.longitude); },
+    function() { document.getElementById('weather-content').innerHTML = '<div class="no-events">Posizione non disponibile</div>'; }
   );
 }
 initWeather();
 
 // ═══════════════════════════════════════════
-//  GOOGLE CALENDAR — OAuth2 implicit flow
+//  GOOGLE OAuth2 (implicit flow)
 // ═══════════════════════════════════════════
 let accessToken = null;
 
@@ -486,14 +446,10 @@ function signOut() {
 }
 
 function renderCalendarAuth() {
-  document.getElementById('calendar-content').innerHTML = `
-    <button class="auth-btn" id="auth-btn" onclick="signIn()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-        <polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
-      </svg>
-      Accedi con Google
-    </button>`;
+  document.getElementById('calendar-content').innerHTML =
+    '<button class="auth-btn" onclick="signIn()">' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>' +
+      'Accedi con Google</button>';
 }
 
 function checkTokenFromUrl() {
@@ -513,244 +469,8 @@ function checkTokenFromUrl() {
 function checkStoredToken() {
   const token = localStorage.getItem('gtoken');
   const exp = parseInt(localStorage.getItem('gtoken_exp') || '0');
-  if (token && Date.now() < exp) {
-    accessToken = token;
-    return true;
-  }
+  if (token && Date.now() < exp) { accessToken = token; return true; }
   return false;
-}
-
-async function loadCalendar() {
-  document.getElementById('calendar-content').innerHTML =
-    `<div style="text-align:center;padding:16px 0"><div class="spinner"></div></div>`;
-
-  try {
-    const now = new Date();
-    const end = new Date(now);
-    end.setDate(end.getDate() + 7);
-
-    const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events?` +
-      new URLSearchParams({
-        timeMin: now.toISOString(),
-        timeMax: end.toISOString(),
-        singleEvents: 'true',
-        orderBy: 'startTime',
-        maxResults: '15'
-      });
-
-    const r = await fetch(url, {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
-
-    if (r.status === 401) {
-      accessToken = null;
-      localStorage.removeItem('gtoken');
-      renderCalendarAuth();
-      return;
-    }
-
-    const data = await r.json();
-    renderEvents(data.items || []);
-  } catch(e) {
-    document.getElementById('calendar-content').innerHTML =
-      `<div class="no-events">Errore caricamento eventi</div>`;
-  }
-}
-
-function renderEvents(events) {
-  if (!events.length) {
-    document.getElementById('calendar-content').innerHTML =
-      `<div class="no-events">Nessun evento nei prossimi 7 giorni</div>
-       <button class="auth-btn logout" onclick="signOut()">Disconnetti account</button>`;
-    return;
-  }
-
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
-
-  const days = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
-  const months2 = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
-
-  let html = '';
-  let lastDay = '';
-
-  events.forEach(ev => {
-    const start = ev.start.dateTime ? new Date(ev.start.dateTime) : new Date(ev.start.date + 'T00:00:00');
-    const startDay = new Date(start); startDay.setHours(0,0,0,0);
-
-    const dayKey = startDay.toDateString();
-    if (dayKey !== lastDay) {
-      lastDay = dayKey;
-      let label;
-      if (startDay.getTime() === today.getTime()) label = 'Oggi';
-      else if (startDay.getTime() === tomorrow.getTime()) label = 'Domani';
-      else label = `${days[startDay.getDay()]} ${startDay.getDate()} ${months2[startDay.getMonth()]}`;
-      html += `<div class="event-day-label">${label}</div>`;
-    }
-
-    const isToday = startDay.getTime() === today.getTime();
-    const timeStr = ev.start.dateTime
-      ? start.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'})
-      : 'tutto il giorno';
-
-    html += `
-      <div class="event-item">
-        <div class="event-time-col">${timeStr}</div>
-        <div class="event-dot${isToday?' today':''}"></div>
-        <div>
-          <div class="event-title">${escapeHtml(ev.summary || '(senza titolo)')}</div>
-          ${ev.location ? `<div class="event-sub">📍 ${escapeHtml(ev.location)}</div>` : ''}
-        </div>
-      </div>`;
-  });
-
-  html += `<button class="auth-btn logout" onclick="signOut()">Disconnetti account</button>`;
-  document.getElementById('calendar-content').innerHTML = html;
-}
-
-function escapeHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-// ═══════════════════════════════════════════
-//  PROMEMORIA (Google Tasks API)
-// ═══════════════════════════════════════════
-let taskListId = null;
-let tasks = [];
-
-function renderRemindersLoggedOut() {
-  document.getElementById('reminders-content').innerHTML =
-    '<div class="no-reminders">Accedi con Google per i tuoi promemoria</div>';
-  document.getElementById('reminders-sync').textContent = '';
-}
-
-async function loadTasks() {
-  const content = document.getElementById('reminders-content');
-  content.innerHTML = `<div style="text-align:center;padding:12px 0"><div class="spinner"></div></div>`;
-
-  try {
-    // 1. Trova la lista di default (la prima)
-    const listRes = await fetch('https://www.googleapis.com/tasks/v1/users/@me/lists', {
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
-    if (listRes.status === 401) { handleAuthExpired(); return; }
-    const lists = await listRes.json();
-    taskListId = lists.items && lists.items.length ? lists.items[0].id : null;
-    if (!taskListId) {
-      content.innerHTML = '<div class="no-reminders">Nessuna lista attività trovata</div>';
-      return;
-    }
-
-    // 2. Carica i task (inclusi i completati)
-    const tRes = await fetch(
-      `https://www.googleapis.com/tasks/v1/lists/${taskListId}/tasks?showCompleted=true&showHidden=true&maxResults=100`,
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
-    const tData = await tRes.json();
-    tasks = (tData.items || []).sort((a, b) => {
-      // non completati prima, poi per posizione
-      if ((a.status === 'completed') !== (b.status === 'completed'))
-        return a.status === 'completed' ? 1 : -1;
-      return (a.position || '').localeCompare(b.position || '');
-    });
-    renderTasks();
-  } catch (e) {
-    content.innerHTML = '<div class="no-reminders">Errore caricamento promemoria</div>';
-  }
-}
-
-function renderTasks() {
-  document.getElementById('reminders-sync').innerHTML =
-    '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#5dcaa5" stroke-width="2.5" style="vertical-align:-1px"><path d="M20 6L9 17l-5-5"/></svg> sincr.';
-
-  const list = tasks.map(t => {
-    const done = t.status === 'completed';
-    return `
-      <div class="reminder-item">
-        <div class="reminder-check${done?' done':''}" onclick="toggleTask('${t.id}')"></div>
-        <div class="reminder-text${done?' done':''}">${escapeHtml(t.title || '(senza titolo)')}</div>
-        <button class="reminder-del" onclick="deleteTask('${t.id}')">×</button>
-      </div>`;
-  }).join('');
-
-  document.getElementById('reminders-content').innerHTML = `
-    <div class="reminder-add">
-      <input type="text" id="reminder-input" placeholder="Nuovo promemoria…" maxlength="120"
-        onkeydown="if(event.key==='Enter') addTask()">
-      <button onclick="addTask()">+</button>
-    </div>
-    ${list || '<div class="no-reminders">Nessun promemoria</div>'}
-  `;
-}
-
-async function addTask() {
-  const input = document.getElementById('reminder-input');
-  const title = input.value.trim();
-  if (!title || !taskListId) return;
-  input.value = '';
-
-  // ottimistico: aggiungo subito in UI
-  const temp = { id: 'temp_' + Date.now(), title, status: 'needsAction', position: '00000' };
-  tasks.unshift(temp);
-  renderTasks();
-
-  try {
-    const res = await fetch(`https://www.googleapis.com/tasks/v1/lists/${taskListId}/tasks`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ title })
-    });
-    if (res.status === 401) { handleAuthExpired(); return; }
-    await loadTasks();
-  } catch (e) {
-    toast('Errore: promemoria non salvato');
-  }
-}
-
-async function toggleTask(id) {
-  const t = tasks.find(x => x.id === id);
-  if (!t) return;
-  const newStatus = t.status === 'completed' ? 'needsAction' : 'completed';
-  t.status = newStatus;
-  renderTasks();
-
-  try {
-    const body = { status: newStatus };
-    if (newStatus === 'completed') body.completed = new Date().toISOString();
-    else body.completed = null;
-
-    const res = await fetch(`https://www.googleapis.com/tasks/v1/lists/${taskListId}/tasks/${id}`, {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-    if (res.status === 401) { handleAuthExpired(); return; }
-    await loadTasks();
-  } catch (e) {
-    toast('Errore sincronizzazione');
-  }
-}
-
-async function deleteTask(id) {
-  tasks = tasks.filter(x => x.id !== id);
-  renderTasks();
-
-  try {
-    const res = await fetch(`https://www.googleapis.com/tasks/v1/lists/${taskListId}/tasks/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${accessToken}` }
-    });
-    if (res.status === 401) { handleAuthExpired(); return; }
-  } catch (e) {
-    toast('Errore eliminazione');
-  }
 }
 
 function handleAuthExpired() {
@@ -763,14 +483,313 @@ function handleAuthExpired() {
 }
 
 // ═══════════════════════════════════════════
-//  TOAST
+//  CALENDARIO — lettura eventi
 // ═══════════════════════════════════════════
+async function loadCalendar() {
+  document.getElementById('calendar-content').innerHTML =
+    '<div style="text-align:center;padding:16px 0"><div class="spinner"></div></div>';
+  try {
+    const now = new Date();
+    const end = new Date(now); end.setDate(end.getDate() + 7);
+    const url = 'https://www.googleapis.com/calendar/v3/calendars/primary/events?' +
+      new URLSearchParams({
+        timeMin: now.toISOString(),
+        timeMax: end.toISOString(),
+        singleEvents: 'true',
+        orderBy: 'startTime',
+        maxResults: '15'
+      });
+    const r = await fetch(url, { headers: { Authorization: 'Bearer ' + accessToken } });
+    if (r.status === 401) { handleAuthExpired(); return; }
+    const data = await r.json();
+    renderEvents(data.items || []);
+  } catch(e) {
+    document.getElementById('calendar-content').innerHTML = '<div class="no-events">Errore caricamento eventi</div>';
+  }
+}
+
+function renderEvents(events) {
+  if (!events.length) {
+    document.getElementById('calendar-content').innerHTML =
+      '<div class="no-events">Nessun evento nei prossimi 7 giorni</div>' +
+      '<button class="auth-btn logout" onclick="signOut()">Disconnetti account</button>';
+    return;
+  }
+  const today = new Date(); today.setHours(0,0,0,0);
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+  const days = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+  const months2 = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+
+  let html = '';
+  let lastDay = '';
+  events.forEach(function(ev) {
+    const start = ev.start.dateTime ? new Date(ev.start.dateTime) : new Date(ev.start.date + 'T00:00:00');
+    const startDay = new Date(start); startDay.setHours(0,0,0,0);
+    const dayKey = startDay.toDateString();
+    if (dayKey !== lastDay) {
+      lastDay = dayKey;
+      let label;
+      if (startDay.getTime() === today.getTime()) label = 'Oggi';
+      else if (startDay.getTime() === tomorrow.getTime()) label = 'Domani';
+      else label = days[startDay.getDay()] + ' ' + startDay.getDate() + ' ' + months2[startDay.getMonth()];
+      html += '<div class="event-day-label">' + label + '</div>';
+    }
+    const isToday = startDay.getTime() === today.getTime();
+    const timeStr = ev.start.dateTime
+      ? start.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'})
+      : 'tutto il giorno';
+    html += '<div class="event-item">' +
+      '<div class="event-time-col">' + timeStr + '</div>' +
+      '<div class="event-dot' + (isToday?' today':'') + '"></div>' +
+      '<div><div class="event-title">' + escapeHtml(ev.summary || '(senza titolo)') + '</div>' +
+      (ev.location ? '<div class="event-sub">📍 ' + escapeHtml(ev.location) + '</div>' : '') +
+      (ev.recurringEventId ? '<div class="event-sub">🔁 ricorrente</div>' : '') +
+      '</div></div>';
+  });
+  html += '<button class="auth-btn logout" onclick="signOut()">Disconnetti account</button>';
+  document.getElementById('calendar-content').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════
+//  CALENDARIO — nuovo evento (scrittura via API)
+// ═══════════════════════════════════════════
+function openEventModal() {
+  if (!accessToken) { toast('Accedi con Google prima'); return; }
+  // data di default: oggi
+  const now = new Date();
+  const p = function(n){ return String(n).padStart(2,'0'); };
+  document.getElementById('ev-date').value = now.getFullYear() + '-' + p(now.getMonth()+1) + '-' + p(now.getDate());
+  document.getElementById('ev-title').value = '';
+  document.getElementById('ev-allday').checked = false;
+  toggleAllDay();
+  document.getElementById('event-modal').classList.add('show');
+}
+
+function closeEventModal() {
+  document.getElementById('event-modal').classList.remove('show');
+}
+
+function toggleAllDay() {
+  const allday = document.getElementById('ev-allday').checked;
+  document.getElementById('ev-time-row').style.display = allday ? 'none' : 'flex';
+}
+
+function fmtLocal(dt) {
+  const p = function(n){ return String(n).padStart(2,'0'); };
+  return dt.getFullYear() + '-' + p(dt.getMonth()+1) + '-' + p(dt.getDate()) +
+         'T' + p(dt.getHours()) + ':' + p(dt.getMinutes()) + ':00';
+}
+
+async function createEvent() {
+  if (!accessToken) { toast('Accedi con Google prima'); return; }
+  const title = document.getElementById('ev-title').value.trim();
+  if (!title) { toast('Inserisci un titolo'); return; }
+  const dateVal = document.getElementById('ev-date').value;
+  if (!dateVal) { toast('Inserisci una data'); return; }
+
+  const allDay = document.getElementById('ev-allday').checked;
+  const recur = document.getElementById('ev-recur').value;
+  const remind = document.getElementById('ev-remind').value;
+
+  const body = { summary: title };
+
+  if (allDay) {
+    const d = new Date(dateVal + 'T00:00:00');
+    d.setDate(d.getDate() + 1);
+    const p = function(n){ return String(n).padStart(2,'0'); };
+    const endDate = d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate());
+    body.start = { date: dateVal };
+    body.end = { date: endDate };
+  } else {
+    const startTime = document.getElementById('ev-start').value || '09:00';
+    const endTime = document.getElementById('ev-end').value;
+    const startDT = new Date(dateVal + 'T' + startTime + ':00');
+    let endDT = endTime ? new Date(dateVal + 'T' + endTime + ':00') : null;
+    if (!endDT || endDT <= startDT) endDT = new Date(startDT.getTime() + 3600000);
+    body.start = { dateTime: fmtLocal(startDT), timeZone: TZ };
+    body.end = { dateTime: fmtLocal(endDT), timeZone: TZ };
+  }
+
+  if (recur) body.recurrence = [recur];
+
+  if (remind === 'none') {
+    body.reminders = { useDefault: false, overrides: [] };
+  } else {
+    body.reminders = { useDefault: false, overrides: [{ method: 'popup', minutes: parseInt(remind) }] };
+  }
+
+  const saveBtn = document.getElementById('ev-save-btn');
+  saveBtn.textContent = 'Salvataggio…';
+  saveBtn.disabled = true;
+
+  try {
+    const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    saveBtn.textContent = 'Salva';
+    saveBtn.disabled = false;
+    if (res.status === 401) { handleAuthExpired(); return; }
+    if (!res.ok) { toast('Errore creazione evento'); return; }
+    closeEventModal();
+    toast('Evento creato ✓');
+    loadCalendar();
+  } catch(e) {
+    saveBtn.textContent = 'Salva';
+    saveBtn.disabled = false;
+    toast('Errore di rete');
+  }
+}
+
+// ═══════════════════════════════════════════
+//  PROMEMORIA (Google Tasks)
+// ═══════════════════════════════════════════
+let taskListId = null;
+let tasks = [];
+
+function renderRemindersLoggedOut() {
+  document.getElementById('reminders-content').innerHTML =
+    '<div class="no-reminders">Accedi con Google per i tuoi promemoria</div>';
+  document.getElementById('reminders-sync').textContent = '';
+}
+
+function openGoogleTasks() {
+  if (/Android/i.test(navigator.userAgent)) {
+    window.location.href = 'intent:#Intent;package=com.google.android.apps.tasks;S.browser_fallback_url=https%3A%2F%2Ftasks.google.com%2F;end';
+  } else {
+    window.open('https://tasks.google.com/', '_blank');
+  }
+}
+
+async function loadTasks() {
+  const content = document.getElementById('reminders-content');
+  content.innerHTML = '<div style="text-align:center;padding:12px 0"><div class="spinner"></div></div>';
+  try {
+    const listRes = await fetch('https://www.googleapis.com/tasks/v1/users/@me/lists', {
+      headers: { Authorization: 'Bearer ' + accessToken }
+    });
+    if (listRes.status === 401) { handleAuthExpired(); return; }
+    const lists = await listRes.json();
+    taskListId = (lists.items && lists.items.length) ? lists.items[0].id : null;
+    if (!taskListId) { content.innerHTML = '<div class="no-reminders">Nessuna lista trovata</div>'; return; }
+
+    const tRes = await fetch(
+      'https://www.googleapis.com/tasks/v1/lists/' + taskListId + '/tasks?showCompleted=true&showHidden=true&maxResults=100',
+      { headers: { Authorization: 'Bearer ' + accessToken } }
+    );
+    const tData = await tRes.json();
+    tasks = (tData.items || []).sort(function(a, b) {
+      if ((a.status === 'completed') !== (b.status === 'completed'))
+        return a.status === 'completed' ? 1 : -1;
+      return (a.position || '').localeCompare(b.position || '');
+    });
+    renderTasks();
+  } catch(e) {
+    content.innerHTML = '<div class="no-reminders">Errore caricamento promemoria</div>';
+  }
+}
+
+function fmtDue(due) {
+  if (!due) return '';
+  const d = new Date(due);
+  const months = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+  return d.getUTCDate() + ' ' + months[d.getUTCMonth()];
+}
+
+function renderTasks() {
+  document.getElementById('reminders-sync').innerHTML =
+    '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#5dcaa5" stroke-width="2.5" style="vertical-align:-1px"><path d="M20 6L9 17l-5-5"/></svg> sincr.';
+
+  if (!tasks.length) {
+    document.getElementById('reminders-content').innerHTML = '<div class="no-reminders">Nessun promemoria</div>';
+    return;
+  }
+  const list = tasks.map(function(t) {
+    const done = t.status === 'completed';
+    const due = fmtDue(t.due);
+    return '<div class="reminder-item">' +
+      '<div class="reminder-check' + (done?' done':'') + '" onclick="toggleTask(\'' + t.id + '\')"></div>' +
+      '<div class="reminder-body">' +
+        '<div class="reminder-text' + (done?' done':'') + '">' + escapeHtml(t.title || '(senza titolo)') + '</div>' +
+        (due ? '<div class="reminder-due">📅 ' + due + '</div>' : '') +
+      '</div>' +
+      '<button class="reminder-del" onclick="deleteTask(\'' + t.id + '\')">×</button>' +
+      '</div>';
+  }).join('');
+  document.getElementById('reminders-content').innerHTML = list;
+}
+
+async function toggleTask(id) {
+  const t = tasks.find(function(x){ return x.id === id; });
+  if (!t) return;
+  const newStatus = t.status === 'completed' ? 'needsAction' : 'completed';
+  t.status = newStatus;
+  renderTasks();
+  try {
+    const body = { status: newStatus };
+    body.completed = newStatus === 'completed' ? new Date().toISOString() : null;
+    const res = await fetch('https://www.googleapis.com/tasks/v1/lists/' + taskListId + '/tasks/' + id, {
+      method: 'PATCH',
+      headers: { Authorization: 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (res.status === 401) { handleAuthExpired(); return; }
+    await loadTasks();
+  } catch(e) { toast('Errore sincronizzazione'); }
+}
+
+function deleteTask(id) {
+  confirmAction('Eliminare questo promemoria? Non sarà recuperabile.', function() { doDeleteTask(id); });
+}
+
+async function doDeleteTask(id) {
+  tasks = tasks.filter(function(x){ return x.id !== id; });
+  renderTasks();
+  try {
+    const res = await fetch('https://www.googleapis.com/tasks/v1/lists/' + taskListId + '/tasks/' + id, {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer ' + accessToken }
+    });
+    if (res.status === 401) { handleAuthExpired(); return; }
+  } catch(e) { toast('Errore eliminazione'); }
+}
+
+// ═══════════════════════════════════════════
+//  CONFERMA generica
+// ═══════════════════════════════════════════
+function confirmAction(message, onYes) {
+  const overlay = document.getElementById('confirm-overlay');
+  document.getElementById('confirm-msg').textContent = message;
+  overlay.classList.add('show');
+  const yesBtn = document.getElementById('confirm-yes');
+  const noBtn = document.getElementById('confirm-no');
+  function cleanup() {
+    overlay.classList.remove('show');
+    yesBtn.onclick = null; noBtn.onclick = null;
+  }
+  yesBtn.onclick = function() { cleanup(); onYes(); };
+  noBtn.onclick = cleanup;
+}
+
+// ═══════════════════════════════════════════
+//  UTIL
+// ═══════════════════════════════════════════
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2500);
+  setTimeout(function(){ el.classList.remove('show'); }, 2500);
 }
+
+// chiudi i modali toccando lo sfondo
+document.getElementById('event-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeEventModal();
+});
 
 // ═══════════════════════════════════════════
 //  INIT
@@ -782,9 +801,8 @@ if (checkTokenFromUrl() || checkStoredToken()) {
   loadTasks();
 }
 
-// SERVICE WORKER
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(() => {});
+  navigator.serviceWorker.register('./sw.js').catch(function(){});
 }
 </script>
 </body>
