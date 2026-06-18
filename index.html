@@ -1,1 +1,688 @@
-<h1>hello</h1>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dashboard">
+<title>MyDashboard</title>
+<link rel="manifest" href="./manifest.json">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: rgba(255,255,255,0.08);
+    --text: #f0f2f8;
+    --muted: #8b90a8;
+    --accent: #7c83f5;
+    --accent2: #5dcaa5;
+    --warn: #ef9f27;
+    --danger: #e24b4a;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 80px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER OROLOGIO ── */
+  .clock-section {
+    padding: 48px 24px 32px;
+    text-align: center;
+  }
+  .clock-time {
+    font-size: 72px;
+    font-weight: 200;
+    letter-spacing: -2px;
+    line-height: 1;
+    color: var(--text);
+  }
+  .clock-time span { color: var(--accent); }
+  .clock-date {
+    margin-top: 8px;
+    font-size: 15px;
+    color: var(--muted);
+    text-transform: capitalize;
+  }
+
+  /* ── CARD BASE ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin: 0 16px 12px;
+  }
+  .card-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-label svg { opacity: 0.6; }
+
+  /* ── METEO ── */
+  .weather-main {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .weather-icon { font-size: 48px; line-height: 1; }
+  .weather-temp {
+    font-size: 44px;
+    font-weight: 200;
+    letter-spacing: -1px;
+  }
+  .weather-temp sup { font-size: 20px; vertical-align: super; color: var(--muted); }
+  .weather-details {
+    flex: 1;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+  .weather-city {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .weather-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .weather-pill {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .weather-pill strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  /* ── STATO AUTH ── */
+  .auth-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s;
+  }
+  .auth-btn:hover { background: rgba(124,131,245,0.1); }
+  .auth-btn.logout {
+    border-color: var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    padding: 8px;
+    margin-top: 10px;
+  }
+
+  /* ── EVENTI CALENDAR ── */
+  .event-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .event-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .event-time-col {
+    min-width: 44px;
+    text-align: right;
+    font-size: 12px;
+    color: var(--muted);
+    padding-top: 1px;
+    line-height: 1.5;
+  }
+  .event-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .event-dot.today { background: var(--accent2); }
+  .event-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .event-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .event-day-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 8px 0 4px;
+  }
+  .no-events {
+    font-size: 14px;
+    color: var(--muted);
+    text-align: center;
+    padding: 16px 0;
+  }
+
+  /* ── PROMEMORIA ── */
+  .reminder-add {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .reminder-add input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+  }
+  .reminder-add input::placeholder { color: var(--muted); }
+  .reminder-add input:focus { border-color: var(--accent); }
+  .reminder-add button {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .reminder-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .reminder-item:last-child { border-bottom: none; }
+  .reminder-check {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .reminder-check.done {
+    background: var(--accent2);
+    border-color: var(--accent2);
+  }
+  .reminder-check.done::after {
+    content: '';
+    width: 5px;
+    height: 9px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translateY(-1px);
+    display: block;
+  }
+  .reminder-text {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text);
+    transition: opacity 0.15s;
+  }
+  .reminder-text.done {
+    opacity: 0.35;
+    text-decoration: line-through;
+  }
+  .reminder-del {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .reminder-del:hover { color: var(--danger); }
+  .no-reminders {
+    font-size: 14px;
+    color: var(--muted);
+    text-align: center;
+    padding: 12px 0;
+  }
+
+  /* ── SPINNER ── */
+  .spinner {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-size: 13px;
+    transition: transform 0.25s ease;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- OROLOGIO -->
+<div class="clock-section">
+  <div class="clock-time" id="clock-time">00<span>:</span>00</div>
+  <div class="clock-date" id="clock-date"></div>
+</div>
+
+<!-- METEO -->
+<div class="card" id="weather-card">
+  <div class="card-label">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+    Meteo
+  </div>
+  <div id="weather-content"><div class="spinner"></div></div>
+</div>
+
+<!-- GOOGLE CALENDAR -->
+<div class="card">
+  <div class="card-label">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Google Calendar
+  </div>
+  <div id="calendar-content">
+    <button class="auth-btn" id="auth-btn" onclick="signIn()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      Accedi con Google
+    </button>
+  </div>
+</div>
+
+<!-- PROMEMORIA -->
+<div class="card">
+  <div class="card-label">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    Promemoria
+  </div>
+  <div class="reminder-add">
+    <input type="text" id="reminder-input" placeholder="Nuovo promemoria…" maxlength="120"
+      onkeydown="if(event.key==='Enter') addReminder()">
+    <button onclick="addReminder()">+</button>
+  </div>
+  <div id="reminders-list"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════
+const GOOGLE_CLIENT_ID = '1070963206755-3eidjscj8u8sc4nlf0n0plu4tb6niq5a.apps.googleusercontent.com';
+const OWM_KEY = '1805b29c395233b1bfa7efcc42e73ead';
+const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
+
+// ═══════════════════════════════════════════
+//  OROLOGIO
+// ═══════════════════════════════════════════
+function updateClock() {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('clock-time').innerHTML = `${hh}<span>:</span>${mm}`;
+
+  const days = ['domenica','lunedì','martedì','mercoledì','giovedì','venerdì','sabato'];
+  const months = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+  document.getElementById('clock-date').textContent =
+    `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ═══════════════════════════════════════════
+//  METEO (GPS → OpenWeatherMap)
+// ═══════════════════════════════════════════
+const weatherIcons = {
+  '01d':'☀️','01n':'🌙','02d':'⛅','02n':'⛅',
+  '03d':'☁️','03n':'☁️','04d':'☁️','04n':'☁️',
+  '09d':'🌧️','09n':'🌧️','10d':'🌦️','10n':'🌦️',
+  '11d':'⛈️','11n':'⛈️','13d':'❄️','13n':'❄️','50d':'🌫️','50n':'🌫️'
+};
+
+async function loadWeather(lat, lon) {
+  try {
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=it&appid=${OWM_KEY}`;
+    const r = await fetch(url);
+    const d = await r.json();
+    const icon = weatherIcons[d.weather[0].icon] || '🌡️';
+    const desc = d.weather[0].description;
+    const temp = Math.round(d.main.temp);
+    const feels = Math.round(d.main.feels_like);
+    const hum = d.main.humidity;
+    const wind = Math.round(d.wind.speed * 3.6);
+    const city = d.name;
+
+    document.getElementById('weather-content').innerHTML = `
+      <div class="weather-main">
+        <div class="weather-icon">${icon}</div>
+        <div>
+          <div class="weather-city">${city}</div>
+          <div style="font-size:13px;color:var(--muted);text-transform:capitalize">${desc}</div>
+        </div>
+        <div class="weather-temp" style="margin-left:auto">${temp}<sup>°C</sup></div>
+      </div>
+      <div class="weather-row">
+        <div class="weather-pill"><strong>${feels}°C</strong>percepita</div>
+        <div class="weather-pill"><strong>${hum}%</strong>umidità</div>
+        <div class="weather-pill"><strong>${wind} km/h</strong>vento</div>
+      </div>
+    `;
+  } catch(e) {
+    document.getElementById('weather-content').innerHTML =
+      `<div class="no-events">Errore caricamento meteo</div>`;
+  }
+}
+
+function initWeather() {
+  if (!navigator.geolocation) {
+    document.getElementById('weather-content').innerHTML =
+      `<div class="no-events">GPS non disponibile</div>`;
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => loadWeather(pos.coords.latitude, pos.coords.longitude),
+    () => {
+      document.getElementById('weather-content').innerHTML =
+        `<div class="no-events">Posizione non disponibile</div>`;
+    }
+  );
+}
+initWeather();
+
+// ═══════════════════════════════════════════
+//  GOOGLE CALENDAR — OAuth2 implicit flow
+// ═══════════════════════════════════════════
+let accessToken = null;
+
+function signIn() {
+  const params = new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID,
+    redirect_uri: window.location.href.split('?')[0].split('#')[0],
+    response_type: 'token',
+    scope: SCOPES,
+    prompt: 'select_account'
+  });
+  window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' + params;
+}
+
+function signOut() {
+  accessToken = null;
+  localStorage.removeItem('gtoken');
+  localStorage.removeItem('gtoken_exp');
+  renderCalendarAuth();
+  toast('Disconnesso da Google');
+}
+
+function renderCalendarAuth() {
+  document.getElementById('calendar-content').innerHTML = `
+    <button class="auth-btn" id="auth-btn" onclick="signIn()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+        <polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
+      </svg>
+      Accedi con Google
+    </button>`;
+}
+
+function checkTokenFromUrl() {
+  const hash = window.location.hash;
+  if (!hash) return false;
+  const params = new URLSearchParams(hash.slice(1));
+  const token = params.get('access_token');
+  const expiresIn = parseInt(params.get('expires_in') || '3600');
+  if (!token) return false;
+  accessToken = token;
+  localStorage.setItem('gtoken', token);
+  localStorage.setItem('gtoken_exp', Date.now() + expiresIn * 1000);
+  history.replaceState(null, '', window.location.pathname);
+  return true;
+}
+
+function checkStoredToken() {
+  const token = localStorage.getItem('gtoken');
+  const exp = parseInt(localStorage.getItem('gtoken_exp') || '0');
+  if (token && Date.now() < exp) {
+    accessToken = token;
+    return true;
+  }
+  return false;
+}
+
+async function loadCalendar() {
+  document.getElementById('calendar-content').innerHTML =
+    `<div style="text-align:center;padding:16px 0"><div class="spinner"></div></div>`;
+
+  try {
+    const now = new Date();
+    const end = new Date(now);
+    end.setDate(end.getDate() + 7);
+
+    const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events?` +
+      new URLSearchParams({
+        timeMin: now.toISOString(),
+        timeMax: end.toISOString(),
+        singleEvents: 'true',
+        orderBy: 'startTime',
+        maxResults: '15'
+      });
+
+    const r = await fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+
+    if (r.status === 401) {
+      accessToken = null;
+      localStorage.removeItem('gtoken');
+      renderCalendarAuth();
+      return;
+    }
+
+    const data = await r.json();
+    renderEvents(data.items || []);
+  } catch(e) {
+    document.getElementById('calendar-content').innerHTML =
+      `<div class="no-events">Errore caricamento eventi</div>`;
+  }
+}
+
+function renderEvents(events) {
+  if (!events.length) {
+    document.getElementById('calendar-content').innerHTML =
+      `<div class="no-events">Nessun evento nei prossimi 7 giorni</div>
+       <button class="auth-btn logout" onclick="signOut()">Disconnetti account</button>`;
+    return;
+  }
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+
+  const days = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+  const months2 = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+
+  let html = '';
+  let lastDay = '';
+
+  events.forEach(ev => {
+    const start = ev.start.dateTime ? new Date(ev.start.dateTime) : new Date(ev.start.date + 'T00:00:00');
+    const startDay = new Date(start); startDay.setHours(0,0,0,0);
+
+    const dayKey = startDay.toDateString();
+    if (dayKey !== lastDay) {
+      lastDay = dayKey;
+      let label;
+      if (startDay.getTime() === today.getTime()) label = 'Oggi';
+      else if (startDay.getTime() === tomorrow.getTime()) label = 'Domani';
+      else label = `${days[startDay.getDay()]} ${startDay.getDate()} ${months2[startDay.getMonth()]}`;
+      html += `<div class="event-day-label">${label}</div>`;
+    }
+
+    const isToday = startDay.getTime() === today.getTime();
+    const timeStr = ev.start.dateTime
+      ? start.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'})
+      : 'tutto il giorno';
+
+    html += `
+      <div class="event-item">
+        <div class="event-time-col">${timeStr}</div>
+        <div class="event-dot${isToday?' today':''}"></div>
+        <div>
+          <div class="event-title">${escapeHtml(ev.summary || '(senza titolo)')}</div>
+          ${ev.location ? `<div class="event-sub">📍 ${escapeHtml(ev.location)}</div>` : ''}
+        </div>
+      </div>`;
+  });
+
+  html += `<button class="auth-btn logout" onclick="signOut()">Disconnetti account</button>`;
+  document.getElementById('calendar-content').innerHTML = html;
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ═══════════════════════════════════════════
+//  PROMEMORIA (localStorage)
+// ═══════════════════════════════════════════
+let reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+
+function saveReminders() {
+  localStorage.setItem('reminders', JSON.stringify(reminders));
+}
+
+function renderReminders() {
+  const el = document.getElementById('reminders-list');
+  if (!reminders.length) {
+    el.innerHTML = '<div class="no-reminders">Nessun promemoria</div>';
+    return;
+  }
+  el.innerHTML = reminders.map((r, i) => `
+    <div class="reminder-item">
+      <div class="reminder-check${r.done?' done':''}" onclick="toggleReminder(${i})"></div>
+      <div class="reminder-text${r.done?' done':''}">${escapeHtml(r.text)}</div>
+      <button class="reminder-del" onclick="deleteReminder(${i})">×</button>
+    </div>
+  `).join('');
+}
+
+function addReminder() {
+  const input = document.getElementById('reminder-input');
+  const text = input.value.trim();
+  if (!text) return;
+  reminders.unshift({ text, done: false, id: Date.now() });
+  saveReminders();
+  renderReminders();
+  input.value = '';
+}
+
+function toggleReminder(i) {
+  reminders[i].done = !reminders[i].done;
+  saveReminders();
+  renderReminders();
+}
+
+function deleteReminder(i) {
+  reminders.splice(i, 1);
+  saveReminders();
+  renderReminders();
+}
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+renderReminders();
+
+if (checkTokenFromUrl() || checkStoredToken()) {
+  loadCalendar();
+}
+
+// SERVICE WORKER
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
