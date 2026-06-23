@@ -9,9 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Dashboard">
 <title>MyDashboard</title>
 <link rel="manifest" href="./manifest.json">
-<link rel="preconnect" href="http://googleusercontent.com/fonts.googleapis.com/0">
-<link rel="preconnect" href="http://googleusercontent.com/fonts.gstatic.com/0" crossorigin>
-<link href="http://googleusercontent.com/fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Oswald:wght@300;500;700&display=swap" rel="stylesheet">
+
 <style>
   :root {
     --bg: #0f1117;
@@ -33,7 +31,7 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     min-height: 100vh;
     padding: 0 0 80px;
     max-width: 480px;
@@ -41,15 +39,25 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* ── TOPBAR BRAND ── */
+  #brand-wrap {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface2); height: 36px; padding: 0 14px;
+    border-radius: 18px; border: 1px solid var(--border);
+    margin: 16px 16px 0;
+    width: fit-content;
+  }
+  #app-icon { width: 18px; height: 18px; object-fit: contain; border-radius: 4px; }
+  #logo { font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--accent); }
+
   /* ── HEADER OROLOGIO ── */
   .clock-section {
-    padding: 48px 24px 32px;
+    padding: 24px 24px 32px;
     text-align: center;
   }
   .clock-time {
-    font-family: 'Oswald', sans-serif;
+    font-family: sans-serif;
     font-size: 78px;
-    line-height: 1;
     letter-spacing: 1px;
     color: var(--text);
   }
@@ -103,7 +111,7 @@
   /* ── METEO ── */
   .weather-main { display: flex; align-items: center; gap: 16px; }
   .weather-icon { font-size: 48px; line-height: 1; }
-  .weather-temp { font-size: 44px; font-weight: 300; font-family: 'Oswald', sans-serif; letter-spacing: -1px; }
+  .weather-temp { font-size: 44px; font-weight: 300; font-family: sans-serif; letter-spacing: -1px; }
   .weather-temp sup { font-size: 20px; vertical-align: super; color: var(--muted); }
   .weather-city { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
   .weather-row { display: flex; gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
@@ -234,6 +242,12 @@
 </style>
 </head>
 <body>
+
+<!-- BRAND / TOPBAR -->
+<div id="brand-wrap">
+  <img id="app-icon" src="icon-192.png" alt="Icona">
+  <span id="logo">MyDashboard</span>
+</div>
 
 <!-- OROLOGIO -->
 <div class="clock-section">
@@ -543,7 +557,6 @@ function renderEvents(events) {
       '<div class="event-dot' + (isToday?' today':'') + '"></div>' +
       '<div><div class="event-title">' + escapeHtml(ev.summary || '(Senza Titolo)') + '</div>' +
       (ev.location ? '<div class="event-sub">📍 ' + escapeHtml(ev.location) + '</div>' : '') +
-      (ev.recurringEventId ? '<div class="event-sub">🔁 ricorrente</div>' : '') +
       '</div></div>';
   });
   html += '<button class="auth-btn logout" onclick="signOut()">Disconnetti Account</button>';

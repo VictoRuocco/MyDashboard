@@ -1,7 +1,7 @@
 {
   "name": "MyDashboard",
-  "short_name": "Dashboard",
-  "description": "Orologio, meteo, calendario e promemoria personali",
+  "short_name": "MyDashboard",
+  "description": "Dashboard per la gestione quotidiana su smartphone di info, appuntamenti, promemoria, etc.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f1117",
